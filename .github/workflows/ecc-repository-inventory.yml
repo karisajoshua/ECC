@@ -1,0 +1,38 @@
+name: ECC Repository Inventory
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 5 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecc-repository-inventory
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout ECC
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inventory public repositories (read only)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ECC_GITHUB_OWNER: karisajoshua
+        run: python scripts/control_plane/inventory.py
+      - name: Upload inventory report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecc-public-repository-inventory
+          path: ecc-public-repository-inventory.json
+          retention-days: 14
