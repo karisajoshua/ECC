@@ -16,7 +16,9 @@ For repo navigation, surface ownership, and PR diff packet guidance, read
 
 ## Skills Discovery
 
-Skills are auto-loaded from `.agents/skills/`. Each skill contains:
+Codex discovers skills from `.agents/skills/` in a repository checkout. Read the
+relevant skill body and its resources when the task calls for it. The native
+plugin exposes the canonical `skills/` surface separately. Each curated skill contains:
 - `SKILL.md` — Detailed instructions and workflow
 - `agents/openai.yaml` — Codex interface metadata
 
@@ -47,21 +49,39 @@ Available skills:
 
 ## MCP Servers
 
-Treat the project-local `.codex/config.toml` as the default Codex baseline for ECC. The current ECC baseline enables GitHub, Context7, Exa, Memory, Playwright, and Sequential Thinking; add heavier extras in `~/.codex/config.toml` only when a task actually needs them.
+The project-local `.codex/config.toml` defines guidance, experimental
+multi-agent support, and role files. It does not configure MCP servers or install
+a native plugin. Loading depends on the Codex version, project trust, and
+higher-level policy; inspect effective configuration before relying on it.
 
-ECC's canonical Codex section name is `[mcp_servers.context7]`. The launcher package remains `@upstash/context7-mcp`; only the TOML section name is normalized for consistency with `codex mcp list` and the reference config.
+The native plugin manifest `.codex-plugin/plugin.json` references `.mcp.json`.
+Its current default is Chrome DevTools; the former GitHub, Context7, Exa, Memory,
+Playwright, and Sequential Thinking defaults are opt-in. See
+`docs/MCP-CONNECTOR-POLICY.md` and `.codex-plugin/README.md`.
+Use available harness-native tools where appropriate; do not install connectors
+or change user configuration just to satisfy an outdated server list.
 
-### Automatic config.toml merging
+### Legacy user configuration sync
 
-The sync script (`scripts/sync-ecc-to-codex.sh`) uses a Node-based TOML parser to safely merge ECC MCP servers into `~/.codex/config.toml`:
+`scripts/sync-ecc-to-codex.sh` is a separate, deprecated compatibility path that
+writes to `~/.codex`. Its merge helpers preserve existing user choices by
+default; `--update-mcp` explicitly replaces managed server definitions.
+Do not run it as a read-only integration test or confuse its user-config
+reference with the project configuration. Prefer native plugin installation
+when an installation is requested, and preserve private user state.
 
-- **Add-only by default** — missing ECC servers are appended; existing servers are never modified or removed.
-- **7 managed servers** — Supabase, Playwright, Context7, Exa, GitHub, Memory, Sequential Thinking.
-- **Canonical naming** — ECC manages Context7 as `[mcp_servers.context7]`; legacy `[mcp_servers.context7-mcp]` entries are treated as aliases during updates.
-- **Package-manager aware** — uses the project's configured package manager (npm/pnpm/yarn/bun) instead of hardcoding `pnpm`.
-- **Drift warnings** — if an existing server's config differs from the ECC recommendation, the script logs a warning.
-- **`--update-mcp`** — explicitly replaces all ECC-managed servers with the latest recommended config (safely removes subtables like `[mcp_servers.supabase.env]`).
-- **User config is always preserved** — custom servers, args, env vars, and credentials outside ECC-managed sections are never touched.
+## Engineering standards and control plane
+
+Read `rules/common/` plus applicable language/domain rules before changing
+code; plugin skill discovery does not automatically apply these rule files.
+Use `ecc-conventions`, `tdd-workflow`, `security-review`, and
+`verification-loop` when relevant and report actual validation results.
+
+For a read-only smoke test, capability limitations, and the proposed reusable
+cross-repository approach, read `docs/control-plane/CODEX-INTEGRATION.md`.
+Follow `docs/control-plane/FOUNDATION.md` for explicit repository enrollment.
+The shipped live view is advisory; the TCAS hook is design-only.
+Do not claim required checks, locks, protection, or deployment from instructions.
 
 ## External Action Boundaries
 
