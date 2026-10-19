@@ -89,6 +89,26 @@ These results do not establish cross-repository enrollment or control-plane
 deployment. Repeat the model smoke in a capable Codex runtime before relying on
 runtime integration.
 
+## Follow-up validation
+
+A second read-only attempt on 2026-10-19 passed the same seven local checks.
+All 122 source snapshot files remained byte-for-byte unchanged by the retry.
+The Codex process still failed before model execution with the read-only
+filesystem initialization error. A normal clone still could not connect to the
+workspace proxy. Neither blocker is resolved by repository instructions.
+
+At commit `ce4833a887fa6901ccf292bf6bbfa7fb34d7003d`, GitHub reported no
+pull-request workflow runs and no commit statuses. The existing `ci.yml` accepts
+PRs targeting `main` only; this PR targets the foundation branch.
+The added `.github/workflows/codex-integration.yml` runs the two dependency-free
+skill/navigation suites for PRs to either target, with read-only repository
+permissions and pinned Actions. This gate does not invoke a model or install ECC;
+its result must be read from the actual GitHub run.
+
+ECC Tools bot comments reported no supported changed-config or harness issues,
+but stated that check publication was unavailable. Comments are not published
+check runs, and no app permission changes are part of this integration.
+
 ## Control-plane boundaries
 
 Read [FOUNDATION.md](FOUNDATION.md) for enrollment and security policy.
