@@ -4,6 +4,22 @@ This is a **production-ready AI coding plugin** providing 71 specialized agents,
 
 **Version:** 2.2.3
 
+## Codex bootstrap
+
+For Codex sessions, before planning or editing:
+
+1. Read `.codex/AGENTS.md` and `docs/CODEX-NAVIGATION-GUIDE.md`. The
+   supplement is outside the root instruction ancestry; read it explicitly.
+2. Read `rules/common/` and the language/domain rules relevant to the files
+   being changed. Load relevant skills from `.agents/skills/`; `skills/`
+   remains canonical and is also exposed by the native Codex plugin.
+3. For engineering control-plane work, read
+   `docs/control-plane/FOUNDATION.md` and
+   `docs/control-plane/CODEX-INTEGRATION.md`. Treat the live view as advisory
+   and the TCAS hook as design-only; do not infer deployed enforcement.
+4. Report missing tools, skills, and checks explicitly. Instructions and plugin
+   registration do not establish runtime permissions or passing CI.
+
 ## Core Principles
 
 1. **Agent-First** — Delegate to specialized agents for domain tasks
